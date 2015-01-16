@@ -18,3 +18,5 @@ PROMPT_COMMAND=set_bash_prompt
 The script assumes 256 color terminal, so modification to color codes may be
 needed.
 Find additional help on terminal coloring: http://misc.flogisoft.com/bash/tip_colors_and_formatting
+
+You can see experiment with foreground and background colors by running `256-colors.sh` from the site above.
