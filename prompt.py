@@ -62,4 +62,5 @@ host = colorize(host_fmt, '\h')
 pwd = colorize(pwd_fmt, '\w')
 env = virtualenv()
 
+# Print the new bash prompt
 print '%s:%s%s%s$ ' % (user, pwd, branch(), env)
