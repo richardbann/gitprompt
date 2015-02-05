@@ -21,9 +21,9 @@ def make_fmt(fg_color=None, bg_color=None,
 user_fmt = make_fmt(66, bold=True)
 host_fmt = make_fmt(144, bold=True)
 pwd_fmt = make_fmt(215, bold=True)
-clean_fmt = make_fmt(40, bold=True, italic=True)
-dirty_fmt = make_fmt(9, bold=True, italic=True)
-env_fmt = make_fmt(115, bold=True, italic=True)
+clean_fmt = make_fmt(76, bold=True)
+dirty_fmt = make_fmt(52, bold=True)
+env_fmt = make_fmt(115, bold=True)
 
 
 def colorize(fmt, str):
@@ -45,7 +45,7 @@ def branch():
     else:
         branch_fmt = dirty_fmt
 
-    return ' (%s)' % colorize(branch_fmt, branch)
+    return '(%s)' % colorize(branch_fmt, branch)
 
 
 def virtualenv():
