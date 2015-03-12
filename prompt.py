@@ -63,4 +63,5 @@ pwd = colorize(pwd_fmt, '\w')
 env = virtualenv()
 
 # Print the new bash prompt
-print '%s:%s%s%s$ ' % (user, pwd, branch(), env)
+print '%s:%s%s%s\n> ' % (user, pwd, branch(), env)
+# print '%s %s\nbranch: %s\nvirtualenv: %s\n> ' % (user, pwd, branch(), env)
