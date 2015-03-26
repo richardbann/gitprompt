@@ -1,5 +1,8 @@
-import subprocess
+# encoding: utf-8
+
 import os
+
+from gitinfo import gitinfo
 
 
 def make_fmt(fg_color=None, bg_color=None,
@@ -18,50 +21,87 @@ def make_fmt(fg_color=None, bg_color=None,
     return fmt
 
 
-user_fmt = make_fmt(66, bold=True)
+user_fmt = make_fmt(fg_color=256, bg_color=234)
 host_fmt = make_fmt(144, bold=True)
-pwd_fmt = make_fmt(215, bold=True)
-clean_fmt = make_fmt(76, bold=True)
-dirty_fmt = make_fmt(52, bold=True)
-env_fmt = make_fmt(115, bold=True)
+pwd_fmt = make_fmt(fg_color=256, bg_color=236)
+env_fmt = make_fmt(fg_color=256, bg_color=238)
+
+branch_fmt = make_fmt(fg_color=256, bg_color=240, bold=True)
+bare_fmt = make_fmt(fg_color=256, bg_color=240, bold=True, italic=True)
+unstaged_fmt = make_fmt(fg_color=9, bg_color=240, bold=True)
+untracked_fmt = make_fmt(fg_color=9, bg_color=240, bold=True)
+staged_fmt = make_fmt(fg_color=48, bg_color=240, bold=True)
+upstream_fmt = make_fmt(fg_color=256, bg_color=240)
 
 
 def colorize(fmt, str):
     return '\[\x1b[%sm\]%s\[\x1b[0m\]' % (fmt, str)
 
 
-def branch():
-    try:
-        out = subprocess.check_output(['git', 'status'],
-                                      stderr=subprocess.STDOUT)
-    except:
-        return ''
-
-    lines = out.splitlines()
-    branch = lines[0][10:]
-
-    if lines[-1] == 'nothing to commit, working directory clean':
-        branch_fmt = clean_fmt
-    else:
-        branch_fmt = dirty_fmt
-
-    return '(%s)' % colorize(branch_fmt, branch)
-
-
 def virtualenv():
     env = os.environ.get('VIRTUAL_ENV', None)
     if env:
-        env = os.path.split(env)[1]
-        return '(%s)' % colorize(env_fmt, env)
+        return os.path.split(env)[1]
     else:
+        return None
+
+
+def formatgitinfo():
+    gi = gitinfo()
+    if gi is None:
         return ''
 
+    sep = colorize(branch_fmt, ' ')
 
-user = colorize(user_fmt, '\u')
-host = colorize(host_fmt, '\h')
-pwd = colorize(pwd_fmt, '\w')
-env = virtualenv()
+    if gi['bare']:
+        fmt = bare_fmt
+    else:
+        fmt = branch_fmt
 
-# Print the new bash prompt
-print '%s:%s%s%s\n> ' % (user, pwd, branch(), env)
-# print '%s %s\nbranch: %s\nvirtualenv: %s\n> ' % (user, pwd, branch(), env)
+    branchinfo = gi['branch']
+    if gi['rebase_desc']:
+        branchinfo += '|' + gi['rebase_desc']
+
+    ret = [colorize(fmt, gi['branch'])]
+
+    dirtyinfo = ''
+    if gi['unstaged']:
+        dirtyinfo += colorize(unstaged_fmt, '.')
+    if gi['staged']:
+        dirtyinfo += colorize(staged_fmt, '.')
+    if gi['staged'] is None:
+        dirtyinfo += colorize(unstaged_fmt, '#')
+    if gi['untracked']:
+        dirtyinfo += colorize(untracked_fmt, '?')
+    if dirtyinfo:
+        ret += [dirtyinfo]
+
+    upstreaminfo = ''
+    us = gi['upstream']
+    if us:
+        upstreaminfo += us['name']
+        ahead, behind = us['ahead'], us['behind']
+        if ahead:
+            upstreaminfo += '+%s' % us['ahead']
+        if behind:
+            upstreaminfo += '-%s' % us['behind']
+        if not ahead and not behind:
+            upstreaminfo += '='
+
+    if upstreaminfo:
+        upstreaminfo = '(%s)' % upstreaminfo
+        upstreaminfo = colorize(upstream_fmt, upstreaminfo)
+        ret += [upstreaminfo]
+
+    return sep + sep.join(ret) + sep
+
+
+user = colorize(user_fmt, ' \u ')
+host = colorize(host_fmt, ' \h ')
+pwd = colorize(pwd_fmt, ' \w ')
+
+_env = virtualenv()
+env = colorize(env_fmt, ' %s ' % _env) if _env else ''
+
+
+print '%s%s%s%s\n> ' % (user, pwd, env, formatgitinfo())
