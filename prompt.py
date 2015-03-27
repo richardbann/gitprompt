@@ -21,24 +21,19 @@ def make_fmt(fg_color=None, bg_color=None,
     return fmt
 
 
-user_fmt = make_fmt(fg_color=256, bg_color=234)
-host_fmt = make_fmt(144, bold=True)
-pwd_fmt = make_fmt(fg_color=256, bg_color=236)
-env_fmt = make_fmt(fg_color=256, bg_color=238)
-
-branch_fmt = make_fmt(fg_color=256, bg_color=240, bold=True)
-bare_fmt = make_fmt(fg_color=256, bg_color=240, bold=True, italic=True)
-unstaged_fmt = make_fmt(fg_color=9, bg_color=240, bold=True)
-untracked_fmt = make_fmt(fg_color=9, bg_color=240, bold=True)
-staged_fmt = make_fmt(fg_color=48, bg_color=240, bold=True)
-upstream_fmt = make_fmt(fg_color=256, bg_color=240)
-
-
 def colorize(fmt, str):
+    """returns the colorized string"""
     return '\[\x1b[%sm\]%s\[\x1b[0m\]' % (fmt, str)
 
 
+def c(str, fg=None, bg=None, bold=False, italic=False, underline=False):
+    """simplified version of colorize"""
+    fmt = make_fmt(fg, bg, bold, italic, underline)
+    return colorize(fmt, str)
+
+
 def virtualenv():
+    """returns the name of the virtualenv, or None"""
     env = os.environ.get('VIRTUAL_ENV', None)
     if env:
         return os.path.split(env)[1]
@@ -47,6 +42,14 @@ def virtualenv():
 
 
 def formatgitinfo():
+    branch_fmt = make_fmt(fg_color=256, bg_color=240, bold=True)
+    bare_fmt = make_fmt(fg_color=256, bg_color=240, bold=True, italic=True)
+    unstaged_fmt = make_fmt(fg_color=202, bg_color=240, bold=True)
+    untracked_fmt = make_fmt(fg_color=202, bg_color=240, bold=True)
+    staged_fmt = make_fmt(fg_color=48, bg_color=240, bold=True)
+    upstream_fmt = make_fmt(fg_color=256, bg_color=240)
+
+    """returns the colorized, formatted git info string"""
     gi = gitinfo()
     if gi is None:
         return ''
@@ -62,17 +65,17 @@ def formatgitinfo():
     if gi['rebase_desc']:
         branchinfo += '|' + gi['rebase_desc']
 
-    ret = [colorize(fmt, gi['branch'])]
+    ret = [colorize(fmt, branchinfo)]
 
     dirtyinfo = ''
     if gi['unstaged']:
-        dirtyinfo += colorize(unstaged_fmt, '.')
+        dirtyinfo += colorize(unstaged_fmt, '•')
     if gi['staged']:
-        dirtyinfo += colorize(staged_fmt, '.')
+        dirtyinfo += colorize(staged_fmt, '•')
     if gi['staged'] is None:
         dirtyinfo += colorize(unstaged_fmt, '#')
     if gi['untracked']:
-        dirtyinfo += colorize(untracked_fmt, '?')
+        dirtyinfo += colorize(untracked_fmt, '⁃')
     if dirtyinfo:
         ret += [dirtyinfo]
 
@@ -96,12 +99,79 @@ def formatgitinfo():
     return sep + sep.join(ret) + sep
 
 
-user = colorize(user_fmt, ' \u ')
-host = colorize(host_fmt, ' \h ')
-pwd = colorize(pwd_fmt, ' \w ')
+def simplegitinfo():
+    """returns a simple git info string"""
+    gi = gitinfo()
+    if gi is None:
+        return ''
 
-_env = virtualenv()
-env = colorize(env_fmt, ' %s ' % _env) if _env else ''
+    branchinfo = gi['branch']
+    if gi['bare']:
+        branchinfo += '[BARE]'
+    if gi['rebase_desc']:
+        branchinfo += '|' + gi['rebase_desc']
+
+    ret = [branchinfo]
+
+    dirtyinfo = ''
+    if gi['unstaged']:
+        dirtyinfo += '*'
+    if gi['staged']:
+        dirtyinfo += '+'
+    if gi['staged'] is None:
+        dirtyinfo += '#'
+    if gi['untracked']:
+        dirtyinfo += '%'
+    if dirtyinfo:
+        ret += [dirtyinfo]
+
+    upstreaminfo = ''
+    us = gi['upstream']
+    if us:
+        upstreaminfo += us['name']
+        ahead, behind = us['ahead'], us['behind']
+        if ahead:
+            upstreaminfo += '+%s' % us['ahead']
+        if behind:
+            upstreaminfo += '-%s' % us['behind']
+        if not ahead and not behind:
+            upstreaminfo += '='
+
+    if upstreaminfo:
+        upstreaminfo = '(%s)' % upstreaminfo
+        ret += [upstreaminfo]
+
+    return ' '.join(ret)
 
 
-print '%s%s%s%s\n> ' % (user, pwd, env, formatgitinfo())
+def getprompt():
+    user = c(' \u ', fg=256, bg=234)
+    # host = c(' \h ', fg=144, bold=True)
+    pwd = c(' \w ', fg=256, bg=236)
+    _env = virtualenv()
+    env = c(' %s ' % _env, fg=256, bg=238) if _env else ''
+
+    return '%s%s%s%s\n> ' % (user, pwd, env, formatgitinfo())
+
+
+def getsimpleprompt():
+    env = virtualenv()
+    git = simplegitinfo()
+
+    env = 'virt: %s' % env if env else ''
+    git = 'git: %s' % git if git else ''
+
+    info = ('%s | %s' % (env, git)).strip(' |')
+    if info:
+        info = '\n%s\n' % info
+    else:
+        info = ''
+
+    return '%s\u@\h:\w> ' % info
+
+
+if __name__ == '__main__':
+    if os.environ.get('PROMPT_STYLE') == 'simple':
+        print getsimpleprompt()
+    else:
+        print getprompt()
