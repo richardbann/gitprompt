@@ -5,6 +5,8 @@ from __future__ import print_function
 import subprocess
 import os
 
+import six
+
 
 def isdir(base, path):
     return os.path.isdir(os.path.join(base, path))
@@ -43,7 +45,9 @@ def cmd(params):
             output = err.output
             exit_code = err.returncode
 
-    return output.decode('utf-8'), exit_code
+    if six.PY3:
+        output = output.decode('utf-8')
+    return output, exit_code
 
 
 def gitinfo():
