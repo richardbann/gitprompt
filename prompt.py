@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+from __future__ import print_function
+
 import os
 
 from gitinfo import gitinfo
@@ -145,9 +147,9 @@ def simplegitinfo():
 
 
 def getprompt():
-    user = c(' \u ', fg=256, bg=234)
+    user = c(r' \u ', fg=256, bg=234)
     # host = c(' \h ', fg=144, bold=True)
-    pwd = c(' \w ', fg=256, bg=236)
+    pwd = c(r' \w ', fg=256, bg=236)
     _env = virtualenv()
     env = c(' %s ' % _env, fg=256, bg=238) if _env else ''
 
@@ -167,11 +169,11 @@ def getsimpleprompt():
     else:
         info = ''
 
-    return '%s\u@\h:\w> ' % info
+    return r'%s\u@\h:\w> ' % info
 
 
 if __name__ == '__main__':
     if os.environ.get('PROMPT_STYLE') == 'simple':
-        print getsimpleprompt()
+        print(getsimpleprompt())
     else:
-        print getprompt()
+        print(getprompt())

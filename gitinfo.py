@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+from __future__ import print_function
+
 import subprocess
 import os
 
@@ -41,7 +43,7 @@ def cmd(params):
             output = err.output
             exit_code = err.returncode
 
-    return output, exit_code
+    return output.decode('utf-8'), exit_code
 
 
 def gitinfo():
@@ -177,7 +179,7 @@ def gitinfo():
 
 def main():
     for k, v in gitinfo().items():
-        print '%s: %s' % (k, v)
+        print('%s: %s' % (k, v))
 
 
 if __name__ == '__main__':
