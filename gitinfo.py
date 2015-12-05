@@ -47,6 +47,8 @@ def cmd(params):
 
     if six.PY3:
         output = output.decode('utf-8')
+
+    output = output.strip()
     return output, exit_code
 
 
