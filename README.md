@@ -3,16 +3,24 @@ A simple `python` script to indicate current `git` branch and status in
 `bash` prompt.
 
 ## Install
-Copy the script (`prompt.py`) into your home directory and put
-the following into `.bashrc`:
+Clone this repo somewhere on your machine:
+
+```bash
+cd ~/somedir/
+git clone https://github.com/vertisfinance/gitprompt.git
+```
+
+Now append this code to your `.bashrc`:
 
 ```bash
 set_bash_prompt(){
-    PS1="$(python ~/prompt.py)"
+    PS1="$(python ~/somedir/prompt.py)"
 }
 
 PROMPT_COMMAND=set_bash_prompt
 ```
+
+Be careful to change `somedir` above according to where `prompt.py` is.
 
 ## Disclaimer
 The script assumes 256 color terminal, so modification to color codes may be
