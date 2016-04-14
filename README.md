@@ -6,7 +6,7 @@ A simple `python` script to indicate current `git` branch and status in
 Clone this repo somewhere on your machine:
 
 ```bash
-cd ~/somedir/
+cd [somedir]
 git clone https://github.com/vertisfinance/gitprompt.git
 ```
 
@@ -14,13 +14,13 @@ Now append this code to your `.bashrc`:
 
 ```bash
 set_bash_prompt(){
-    PS1="$(python ~/somedir/prompt.py)"
+    PS1="$(python [somedir]/gitprompt/prompt.py)"
 }
 
 PROMPT_COMMAND=set_bash_prompt
 ```
 
-Be careful to change `somedir` above according to where `prompt.py` is.
+Be careful to change `somedir` above according to where you have cloned the repo.
 
 ## Disclaimer
 The script assumes 256 color terminal, so modification to color codes may be
