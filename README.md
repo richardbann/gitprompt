@@ -7,7 +7,7 @@ Clone this repo somewhere on your machine:
 
 ```bash
 cd [somedir]
-git clone https://github.com/vertisfinance/gitprompt.git
+git clone https://github.com/richardbann/gitprompt.git
 ```
 
 Now append this code to your `.bashrc`:
