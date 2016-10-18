@@ -151,7 +151,7 @@ def getprompt():
     # host = c(' \h ', fg=144, bold=True)
     pwd = c(r' \w ', fg=256, bg=236)
     _env = virtualenv()
-    env = c(' %s ' % _env, fg=256, bg=238) if _env else ''
+    env = c(' %s ' % _env, fg=222, bg=21, bold=True) if _env else ''
 
     return '%s%s%s%s\n> ' % (user, pwd, env, formatgitinfo())
 
