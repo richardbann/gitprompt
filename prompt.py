@@ -148,12 +148,12 @@ def simplegitinfo():
 
 def getprompt():
     user = c(r' \u ', fg=256, bg=234)
-    # host = c(' \h ', fg=144, bold=True)
+    host = c(' \h ', fg=144, bold=True)
     pwd = c(r' \w ', fg=256, bg=236)
     _env = virtualenv()
     env = c(' %s ' % _env, fg=222, bg=21, bold=True) if _env else ''
 
-    return '%s%s%s%s\n> ' % (user, pwd, env, formatgitinfo())
+    return '%s%s%s%s%s\n> ' % (user, host, pwd, env, formatgitinfo())
 
 
 def getsimpleprompt():
